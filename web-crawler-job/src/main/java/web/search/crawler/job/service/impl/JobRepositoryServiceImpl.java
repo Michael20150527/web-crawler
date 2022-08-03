@@ -29,58 +29,50 @@ public class JobRepositoryServiceImpl implements JobRepositoryService {
         this.jobRepository.saveAll(list);
     }
 
-    //salary: *-*
-    //page: 1
-    //jobaddr: 北京
-    //keyword: java
     @Override
     public JobResult search(String salary, String jobaddr, String keyword, Integer page) {
-        //解析参数薪资
+        // Analyze parameter salary
         String[] salarys = salary.split("-");
 
         int salaryMin = 0, salaryMax = 0;
 
-        //获取最低薪资
+        // Get the minimum salary
         if ("*".equals(salarys[0])) {
-            //如果最小值是*，表示最低薪资是0
+            // If the minimum value is *, the minimum salary is 0
         } else {
-            //如果最小值不是*，需要转为数字类型，乘以10000
+            // If the minimum value is not *, it needs to be converted to numeric type and multiplied by 10000
             salaryMin = Integer.parseInt(salarys[0]) * 10000;
         }
 
 
-        //获取最高薪资
+        // Get the highest salary
         if ("*".equals(salarys[1])) {
-            //如果最大值是*，代表最大的数也包含,设置为1000万
+            // If the maximum value is *, the maximum number is also included, set to 10 million
             salaryMax = 10000000;
         } else {
-            //如果最大值不是*，需要转为数字类型，乘以10000
+            // If the maximum value is not *, it needs to be converted to numeric type and multiplied by 10000
             salaryMax = Integer.parseInt(salarys[0]) * 10000;
         }
 
-        //判断工作地点是否为空
+        // Judge whether the work place is empty
         if (StringUtils.isBlank(jobaddr)) {
-            //如果为空，设置为*
+            // If it is empty, set to *
             jobaddr = "*";
         }
 
-        //判断查询关键词是否为空
+        // Judge whether the query keyword is empty
         if (StringUtils.isBlank(keyword)) {
-            //如果为空，设置为*
+            // If it is empty, set to *
             keyword = "*";
         }
 
-
-        //调用dao的方法执行查询
         Page<JobInfoField> pages = this.jobRepository.findBySalaryMinBetweenAndSalaryMaxBetweenAndJobAddrAndJobNameAndJobInfo(salaryMin,
                 salaryMax, salaryMin, salaryMax, jobaddr, keyword, keyword, PageRequest.of(page-1,30));
 
-        //封装结果对象jobResult
         JobResult jobResult = new JobResult();
 
-        //设置结果集
         jobResult.setRows(pages.getContent());
-        //设置总页数
+        // Set total pages
         jobResult.setPageTotal(pages.getTotalPages());
 
         return jobResult;

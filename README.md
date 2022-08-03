@@ -1,4 +1,6 @@
 # web-crawler
+Environment: Java 1.8 mysql Elasticsearch.
+
 web-crawler-job includes the following functionalities:
 1. Download html pages and store them to db.
 2. Import data from DB to Elasticsearch.

@@ -22,18 +22,16 @@ public class JobInfoServiceImpl implements JobInfoService {
     @Override
     @Transactional
     public void save(JobInfo jobInfo) {
-        //根据url和发布时间查询数据
         JobInfo param = new JobInfo();
         param.setUrl(jobInfo.getUrl());
         param.setTime(jobInfo.getTime());
 
-        //执行查询
         List<JobInfo> list = this.findJobInfo(param);
 
-
-        //判断查询结果是否为空
         if (list.size() == 0) {
-            //如果查询结果为空，表示招聘信息数据不存在，或者已经更新了，需要新增或者更新数据库
+            // If the query result is empty,
+            // it means that the recruitment information data does not exist or has been updated,
+            // and the database needs to be added or updated
             this.jobInfoDao.saveAndFlush(jobInfo);
         }
     }
@@ -41,10 +39,9 @@ public class JobInfoServiceImpl implements JobInfoService {
     @Override
     public List<JobInfo> findJobInfo(JobInfo jobInfo) {
 
-        //设置查询条件
+        // Set query condition
         Example example = Example.of(jobInfo);
 
-        //执行查询
         List list = this.jobInfoDao.findAll(example);
 
         return list;

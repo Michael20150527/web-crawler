@@ -26,45 +26,42 @@ public class JobProcessor implements PageProcessor {
 
     @Override
     public void process(Page page) {
-        //解析页面，获取招聘信息详情的url地址
+        // Parse the page to obtain the URL address of recruitment information details
         List<Selectable> list = page.getHtml().css("div#resultList div.el").nodes();
 
 
-        //判断获取到的集合是否为空
+        // Judge whether the obtained set is empty
         if (list.size() == 0) {
-            // 如果为空，表示这是招聘详情页,解析页面，获取招聘详情信息，保存数据
+            // If it is blank, it means this is the recruitment details page.
+            // Parse the page, get the recruitment details and save the data
             this.saveJobInfo(page);
 
         } else {
-            //如果不为空，表示这是列表页,解析出详情页的url地址，放到任务队列中
+            // If it is not empty, it means this is a list page.
+            // Resolve the URL address of the details page and put it in the task queue
             for (Selectable selectable : list) {
-                //获取url地址
+                // Get url address
                 String jobInfoUrl = selectable.links().toString();
-                //把获取到的url地址放到任务队列中
+                // Put the obtained URL address into the task queue
                 page.addTargetRequest(jobInfoUrl);
             }
 
-            //获取下一页的url
+            // Get the URL of the next page
             String bkUrl = page.getHtml().css("div.p_in li.bk").nodes().get(1).links().toString();
-            //把url放到任务队列中
+            // Put the URL in the task queue
             page.addTargetRequest(bkUrl);
 
         }
 
-        String html = page.getHtml().toString();
-        System.out.println(123);
-
     }
 
-    //解析页面，获取招聘详情信息，保存数据
+    // Analyze the page, obtain recruitment details and save data
     private void saveJobInfo(Page page) {
-        //创建招聘详情对象
         JobInfo jobInfo  = new JobInfo();
 
-        //解析页面
         Html html = page.getHtml();
 
-        //获取数据，封装到对象中
+        // Get data and encapsulate them into objects
         jobInfo.setCompanyName(html.css("div.cn p.cname a","text").toString());
         jobInfo.setCompanyAddr(Jsoup.parse(html.css("div.bmsg").nodes().get(1).toString()).text());
         jobInfo.setCompanyInfo(Jsoup.parse(html.css("div.tmsg").toString()).text());
@@ -73,25 +70,25 @@ public class JobProcessor implements PageProcessor {
         jobInfo.setJobInfo(Jsoup.parse(html.css("div.job_msg").toString()).text());
         jobInfo.setUrl(page.getUrl().toString());
 
-        //获取薪资
+        // Get salary
         Integer[] salary = MathSalary.getSalary(html.css("div.cn strong", "text").toString());
         jobInfo.setSalaryMin(salary[0]);
         jobInfo.setSalaryMax(salary[1]);
 
-        //获取发布时间
+        // Get release time
         String time = Jsoup.parse(html.css("div.t1 span").regex(".*发布").toString()).text();
         jobInfo.setTime(time.substring(0,time.length()-2));
 
-        //把结果保存起来
+        // Save the result
         page.putField("jobInfo",jobInfo);
     }
 
 
     private Site site = Site.me()
-            .setCharset("gbk")//设置编码
-            .setTimeOut(10 * 1000)//设置超时时间
-            .setRetrySleepTime(3000)//设置重试的间隔时间
-            .setRetryTimes(3);//设置重试的次数
+            .setCharset("gbk")
+            .setTimeOut(10 * 1000)
+            .setRetrySleepTime(3000)
+            .setRetryTimes(3);
 
     @Override
     public Site getSite() {
@@ -101,12 +98,12 @@ public class JobProcessor implements PageProcessor {
     @Autowired
     private SpringDataPipeline springDataPipeline;
 
-    //initialDelay当任务启动后，等等多久执行方法
-    //fixedDelay每个多久执行方法
+    //initialDelay: how long to execute the method after the task is started
+    //fixedDelay: Interval between each execution
     @Scheduled(initialDelay = 1000, fixedDelay = 100 * 1000)
     public void process() {
         Spider.create(new JobProcessor())
-                .addUrl(url) // 可传多个url
+                .addUrl(url) // Multiple URLs can be transferred
                 .setScheduler(new QueueScheduler().setDuplicateRemover(new BloomFilterDuplicateRemover(100000)))
                 .thread(10)
                 .addPipeline(this.springDataPipeline)

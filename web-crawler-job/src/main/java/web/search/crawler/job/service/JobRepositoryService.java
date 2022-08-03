@@ -8,7 +8,7 @@ import java.util.List;
 public interface JobRepositoryService {
 
     /**
-     * 保存一条数据
+     * Save a piece of data
      *
      * @param jobInfoField
      */
@@ -16,14 +16,15 @@ public interface JobRepositoryService {
 
 
     /**
-     * 批量保存数据
+     * Save data by batch
      *
      * @param list
      */
     public void saveAll(List<JobInfoField> list);
 
     /**
-     * 根据条件分页查询招聘信息
+     * Query recruitment information by page according to conditions
+     *
      * @param salary
      * @param jobaddr
      * @param keyword

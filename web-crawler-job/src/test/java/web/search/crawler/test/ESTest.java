@@ -17,6 +17,9 @@ import web.search.crawler.job.service.JobRepositoryService;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Migrate data from DB to ES manually
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = Application.class)
 public class ESTest {
@@ -28,8 +31,9 @@ public class ESTest {
     @Autowired
     private JobRepositoryService jobRepositoryService;
 
-
-    //创建索引和映射
+    /**
+     * Create index and mapping
+     */
     @Test
     public void createIndex() {
         this.elasticsearchTemplate.createIndex(JobInfoField.class);
@@ -41,40 +45,30 @@ public class ESTest {
      */
     @Test
     public void jobInfoData() {
-        //声明页码数，从1开始
         int p = 1;
-        //声明查询到的数据条数
         int pageSize = 0;
 
         do {
-            //从数据库中查询数据
+            // Retrieve data from DB
             Page<JobInfo> page = this.jobInfoService.findJobInfoByPage(p, 500);
 
-            //声明容器存放JobInfoField
             List<JobInfoField> list = new ArrayList<>();
 
-            //把查询到的数据封装为JobInfoField
             for (JobInfo jobInfo : page.getContent()) {
-                //声明对象
                 JobInfoField jobInfoField = new JobInfoField();
-                //封装数据,复制数据
                 BeanUtils.copyProperties(jobInfo, jobInfoField);
-
-                //把封装好数据的对象放到list容器中
                 list.add(jobInfoField);
-
             }
 
-            //把封装好的数据保存到索引库中
+            // Save data to ES
             this.jobRepositoryService.saveAll(list);
 
-            //页码数加一
+            // Page number plus one
             p++;
 
-            //获取查询结果集的数据条数
+            // Get the number of result set
             pageSize = page.getContent().size();
 
         } while (pageSize == 500);
-
     }
 }

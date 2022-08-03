@@ -8,7 +8,7 @@ import java.util.List;
 public interface JobInfoService {
 
     /**
-     * 保存工作信息
+     * Save job information
      *
      * @param jobInfo
      */
@@ -16,7 +16,7 @@ public interface JobInfoService {
 
 
     /**
-     * 根据条件查询工作信息
+     * Query job information according to conditions
      *
      * @param jobInfo
      * @return
@@ -24,7 +24,8 @@ public interface JobInfoService {
     public List<JobInfo> findJobInfo(JobInfo jobInfo);
 
     /**
-     * 分页查询数据
+     * Query data by page
+     *
      * @param page
      * @param rows
      * @return

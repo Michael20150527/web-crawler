@@ -13,15 +13,9 @@ public class SearchController {
     @Autowired
     private JobRepositoryService jobRepositoryService;
 
-    //salary: *-*
-    //page: 1
-    //jobaddr: 北京
-    //keyword: java
-    //Request URL: http://127.0.0.1:8080/search
-    //Request Method: POST
-
     /**
-     * 根据条件分页查询招聘信息
+     * Query recruitment information by page according to conditions
+     *
      * @param salary
      * @param jobaddr
      * @param keyword

@@ -17,12 +17,11 @@ public class SpringDataPipeline implements Pipeline {
 
     @Override
     public void process(ResultItems resultItems, Task task) {
-        //获取封装好的招聘详情对象
+        // Get the encapsulated recruitment details object
         JobInfo jobInfo = resultItems.get("jobInfo");
 
-        //判断数据是否不为空
         if (jobInfo != null) {
-            //如果不为空把数据保存到数据库中
+            // If it is not empty, save the data to the database
             this.jobInfoService.save(jobInfo);
         }
     }
